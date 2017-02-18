@@ -35,7 +35,7 @@ if(verbosity_)  for(unsigned int i=0; i<digi.size();i++)std::cout<< digi[i].adc(
    int row = (*RPdit).row();
    int column = (*RPdit).column();
    int adc = (*RPdit).adc();
-   int electrons = calibrate(adc,row,column,detId);
+   int electrons = calibrate(adc,row,column);
 //calibrate digi and store the new ones (it still does nothing!!)
    RPixCalibDigi calibDigi(row,column,adc,electrons);
    calib_rpix_digi_set_.insert(calibDigi);
@@ -99,6 +99,7 @@ void RPixDetClusterizer::make_cluster(RPixCalibDigi aSeed,  std::vector<CTPPSPix
  atempCluster.addPixel(aSeed.row(),aSeed.column(),aSeed.electrons());
 calib_rpix_digi_set_.erase( aSeed );
 
+
  while ( ! atempCluster.empty()) {
    //This is the standard algorithm to find and add a pixel
      auto curInd = atempCluster.top(); atempCluster.pop();
@@ -123,8 +124,10 @@ calib_rpix_digi_set_.erase( aSeed );
 	     
  }  // while accretion
 
+
   endClus:
      //  SiPixelCluster cluster(atempCluster.isize,atempCluster.adc, atempCluster.x,atempCluster.y, atempCluster.xmin,atempCluster.ymin);
+
 
   if(verbosity_) atempCluster.printCluster();
   CTPPSPixelCluster cluster(atempCluster.isize,atempCluster.adc, atempCluster.row,atempCluster.col, atempCluster.rowmin,atempCluster.colmin);
@@ -134,11 +137,11 @@ calib_rpix_digi_set_.erase( aSeed );
 
 }
 
-int RPixDetClusterizer::calibrate(int adc, int row, int col, unsigned int detid){
+
+int RPixDetClusterizer::calibrate(int adc, int row, int col){
 
   const double gain = ElectronADCGain_;
   const double pedestal = 0;
-  unsigned int dummy = detid;  
 //here DB values could be used instead
 
   int electrons = int(adc*gain + pedestal);
